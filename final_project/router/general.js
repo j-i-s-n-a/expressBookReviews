@@ -32,12 +32,11 @@ public_users.get('/',function (req, res) {
   return res.status(200).send(JSON.stringify(books, null, 4));
 });
 
-public_users.get('/isbn/:isbn', async function (req, res) {
+public_users.get('/isbn/:isbn', async (req, res) => {
     const isbn = req.params.isbn;
   
     try {
-      const response = await axios.get(`http://localhost:5000/books`);
-  
+      const response = await axios.get("http://localhost:5000/");
       const books = response.data;
   
       if (books[isbn]) {
@@ -45,41 +44,34 @@ public_users.get('/isbn/:isbn', async function (req, res) {
       } else {
         return res.status(404).json({ message: "Book not found" });
       }
-  
     } catch (error) {
-      return res.status(500).json({ message: "Error fetching book details" });
+      return res.status(500).json({ message: "Error retrieving book" });
     }
   });
+  
 
 // Get all books based on title
-public_users.get('/title/:title', async function (req, res) {
-
-    const title = req.params.title;
+public_users.get('/title/:title', async (req, res) => {
+    const title = req.params.title.toLowerCase();
   
     try {
-  
-      const response = await axios.get('http://localhost:5000/books');
+      const response = await axios.get("http://localhost:5000/");
       const books = response.data;
   
-      let result = [];
-  
-      for (let key in books) {
-        if (books[key].title === title) {
-          result.push(books[key]);
-        }
-      }
+      const result = Object.values(books).filter(
+        (book) => book.title.toLowerCase() === title
+      );
   
       if (result.length > 0) {
         return res.status(200).json(result);
       } else {
-        return res.status(404).json({ message: "No books found with this title" });
+        return res.status(404).json({ message: "Book not found" });
       }
-  
     } catch (error) {
-      return res.status(500).json({ message: "Error fetching books by title" });
+      return res.status(500).json({ message: "Error retrieving books" });
     }
-  
   });
+  
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
