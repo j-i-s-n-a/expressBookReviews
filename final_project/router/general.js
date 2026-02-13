@@ -52,20 +52,34 @@ public_users.get('/isbn/:isbn', async function (req, res) {
   });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  const title = req.params.title;
-    const result = [];
+public_users.get('/title/:title', async function (req, res) {
 
-    const keys = Object.keys(books);
-
-    keys.forEach((key) => {
+    const title = req.params.title;
+  
+    try {
+  
+      const response = await axios.get('http://localhost:5000/books');
+      const books = response.data;
+  
+      let result = [];
+  
+      for (let key in books) {
         if (books[key].title === title) {
-            result.push(books[key]);
+          result.push(books[key]);
         }
-    });
-
-    return res.status(200).json(result);
-});
+      }
+  
+      if (result.length > 0) {
+        return res.status(200).json(result);
+      } else {
+        return res.status(404).json({ message: "No books found with this title" });
+      }
+  
+    } catch (error) {
+      return res.status(500).json({ message: "Error fetching books by title" });
+    }
+  
+  });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
