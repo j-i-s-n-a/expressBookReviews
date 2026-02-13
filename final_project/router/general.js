@@ -32,22 +32,28 @@ public_users.get('/',function (req, res) {
   return res.status(200).send(JSON.stringify(books, null, 4));
 });
 
-public_users.get('/isbn/:isbn', async (req, res) => {
+public_users.get('/isbn/:isbn', function (req, res) {
+
     const isbn = req.params.isbn;
   
-    try {
-      const response = await axios.get("http://localhost:5000/");
-      const books = response.data;
+    axios.get('http://localhost:5000/')
+      .then(response => {
   
-      if (books[isbn]) {
-        return res.status(200).json(books[isbn]);
-      } else {
-        return res.status(404).json({ message: "Book not found" });
-      }
-    } catch (error) {
-      return res.status(500).json({ message: "Error retrieving book" });
-    }
+        const books = response.data;
+  
+        if (books[isbn]) {
+          res.status(200).json(books[isbn]);
+        } else {
+          res.status(404).json({ message: "Book not found" });
+        }
+  
+      })
+      .catch(error => {
+        res.status(500).json({ message: "Error fetching book details" });
+      });
+  
   });
+  
   
 
 // Get all books based on title
@@ -55,7 +61,7 @@ public_users.get('/title/:title', async (req, res) => {
     const title = req.params.title.toLowerCase();
   
     try {
-      const response = await axios.get("http://localhost:5000/");
+      const response = await axios.get('http://localhost:5000/');
       const books = response.data;
   
       const result = Object.values(books).filter(
@@ -100,7 +106,7 @@ public_users.get('/author/:author', async function (req, res) {
   
     try {
   
-      const response = await axios.get('http://localhost:5000/books');
+      const response = await axios.get('http://localhost:5000/');
   
       const books = response.data;
       let result = [];
